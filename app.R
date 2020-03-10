@@ -1,5 +1,6 @@
 #load shiny 
 library(shiny)
+library(reshape2)
 
 #inputs and outputs
 ui<- fluidPage("ARPE19 cancer cell progression through the Ras pathway",
@@ -12,26 +13,28 @@ ui<- fluidPage("ARPE19 cancer cell progression through the Ras pathway",
                            c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")),
                submitButton(text = "Apply Changes", icon = NULL, width = NULL),
                mainPanel(
-                 tableOutput(outputId = "contents")
+                 plotOutput(outputId = "boxplot")
                )
               )
 
 
 #server
 server<- function(input, output) {
-  output$contents<- renderTable({ req(input$counts)
+  output$boxplot<- renderPlot({ 
+    req(input$Counts)
     tryCatch(
       {
-        df<- read.csv(input$counts$datapath,
-                      header = input$header,
-                      sep= input$sep,
-                      quote= input$quote)
+        df<- read.csv(input$Counts$datapath
+                      )
       },
       error = function (e){
         stop(safeError(e))
       }
     )
-   return(df)
+   #return(df)
+    melted = melt(df)
+    boxplot(melted$value ~ melted$Gene)
+    #boxplot(log(df[[2]]))
     })
 }
 
