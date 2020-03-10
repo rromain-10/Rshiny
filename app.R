@@ -11,14 +11,30 @@ ui<- fluidPage("ARPE19 cancer cell progression through the Ras pathway",
                checkboxGroupInput(inputId = "Sample", label = " Choose sample",
                            c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")),
                submitButton(text = "Apply Changes", icon = NULL, width = NULL),
-               plotOutput(outputId = "plot"),
+               mainPanel(
+                 tableOutput(outputId = "contents")
+               )
               )
 
 
 #server
 server<- function(input, output) {
-  output$plot<- renderPlot({input$counts}),
-  read.csv(inFile$datapath, header = input$header))
+  output$contents<- renderTable({ req(input$counts)
+    tryCatch(
+      {
+        df<- read.csv(input$counts$datapath,
+                      header = input$header,
+                      sep= input$sep,
+                      quote= input$quote)
+      },
+      error = function (e){
+        stop(safeError(e))
+      }
+    )
+   return(df)
+    })
+}
+
  
 #
 shinyApp(ui=ui, server =server)
