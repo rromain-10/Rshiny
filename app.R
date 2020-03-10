@@ -33,7 +33,20 @@ server<- function(input, output) {
     )
    #return(df)
     melted = melt(df)
-    boxplot(melted$value ~ melted$Gene)
+    boxplot(melted$value ~ melted$Gene, xaxt="n")
+    text(x = 1:length(levels(melted$Gene)),
+         ## Move labels to just below bottom of chart.
+         y = par("usr")[3] - 0.90,
+         ## Use names from the data list.
+         labels = levels(melted$Gene),
+         ## Change the clipping region.
+         xpd = NA,
+         ## Rotate the labels by 35 degrees.
+         srt = 35,
+         ## Adjust the labels to almost 100% right-justified.
+         adj = 0.965,
+         ## Increase label size.
+         cex = 1.2)
     #boxplot(log(df[[2]]))
     })
 }
