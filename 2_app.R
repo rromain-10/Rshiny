@@ -22,10 +22,6 @@ ui<- fluidPage(
                 accept = NULL,
                 width = NULL,
                 buttonLabel = "Browse..."),
-      # checkboxGroupInput(inputId = "Gene",
-      #                    label = " Choose Gene of Interest(s)",
-      #                    choices =  c("PPP1CB", "PPP2R5C", "BUB1B","AURKB" ,"SKA1"),
-      #                    selected = "PPP1CB" ),
       checkboxGroupInput(inputId = "gene", 
                          label = " Choose Gene of Interest",
                          unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
@@ -35,10 +31,10 @@ ui<- fluidPage(
       checkboxGroupInput(inputId = "sample", label = " Choose sample",
                          c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
       ),
-      # submitButton(text = "Apply Changes", 
-      #              icon = NULL,
-      #              width = NULL),
-      # conditionalPanel(condition = "output.nrows")
+      submitButton(text = "Apply Changes",
+                   icon = NULL,
+                   width = NULL),
+      conditionalPanel(condition = "output.nrows")
     ),
     mainPanel(
       plotOutput("boxplot1"),
@@ -59,14 +55,14 @@ server<- function(input,output, session) {
     output$boxplot1<- renderPlot({
       filtered <-
         df %>%
-        filter(Gene == input$Gene,
+        filter(Gene == df$Gene,
                  ARPE19 == input$ARPE19,
                  T53D4 == input$T53D4,
                  RasV12 == input$RasV12,
                  MekDD == input$MekDD,
                  Aktmyr == input$Aktmyr
         )
-      ggplot(filtered, aes(counts))+
+      ggplot(filtered, aes(x= Gene, y= sample, counts))+
         geom_boxplot()
     })
     # output$boxplot1<- renderPlot({
