@@ -9,8 +9,8 @@ library(dplyr)
 #                          )
 #goi_counts
 
-df<- read.csv("DEseq2 means_goi_ncounts.csv")
-print(str(df))
+
+#print(str(df))
 
 ui<- fluidPage(
   titlePanel("ARPE19 progression"),
@@ -22,18 +22,18 @@ ui<- fluidPage(
                 accept = NULL,
                 width = NULL,
                 buttonLabel = "Browse..."),
-      checkboxGroupInput(inputId = "gene", 
+      checkboxGroupInput(inputId = "Gene", 
                          label = " Choose Gene of Interest",
+                         selected=unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
+                                         split=' ')),
                          unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
                                          split=' ')
                          )
       ),
-      checkboxGroupInput(inputId = "sample", label = " Choose sample",
+      checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD"),
                          c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
       ),
-      submitButton(text = "Apply Changes",
-                   icon = NULL,
-                   width = NULL),
+
       conditionalPanel(condition = "output.nrows")
     ),
     mainPanel(
@@ -45,25 +45,37 @@ ui<- fluidPage(
 
 
 server<- function(input,output, session) {
-  session$onSessionEnded(stopApp)
+  session$onSessionEnded(stopApp);
+  goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
   ({
-    output$contents<- renderTable({
-      in_counts<-input$counts 
-      df<-read.csv(input$counts$datapath
-    )
-    })
+    # output$contents<- renderTable({
+    #    in_counts<-input$counts 
+    #   
+    # )
+    # });
     output$boxplot1<- renderPlot({
-      filtered <-
-        df %>%
-        filter(Gene == df$Gene,
-                 ARPE19 == input$ARPE19,
-                 T53D4 == input$T53D4,
-                 RasV12 == input$RasV12,
-                 MekDD == input$MekDD,
-                 Aktmyr == input$Aktmyr
+      print("rendering plot")
+      filtered = goi_ncounts
+      melted = melt(goi_ncounts)
+      colnames(melted) <- c("Gene","sample","counts")
+      print(input$sample)
+      filtered = melted[melted$Gene %in% input$Gene & melted$sample %in% input$sample,]
+      print(filtered)
+      ggplot(filtered, 
+             aes(x=sample,y=log(counts),
+                 group=Gene,
+                 col=Gene, 
+                 linetype=Gene)) + 
+        geom_line(size = 1.5)  +
+        scale_linetype_manual(values = c(rep("solid", 10), 
+                                         rep("dotted", 10)
         )
-      ggplot(filtered, aes(x= Gene, y= sample, counts))+
-        geom_boxplot()
+        ) +
+        scale_color_manual(values = c(brewer.pal(10,"Spectral"),
+                                      brewer.pal(10,"Spectral")
+        )
+        ) +
+        theme_bw()
     })
     # output$boxplot1<- renderPlot({
     #   req(input$counts)
