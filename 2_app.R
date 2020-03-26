@@ -65,7 +65,7 @@ server<- function(input,output, session) {
       filtered = melted[melted$Gene %in% input$Gene & melted$sample %in% input$sample,]
       print(filtered)
       ggplot(filtered, 
-             aes(x=sample,y=log(counts),
+             aes(x=sample,y=counts,
                  group=Gene,
                  col=Gene, 
                  linetype=Gene)) + 
