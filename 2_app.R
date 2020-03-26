@@ -3,6 +3,8 @@ library(ggplot2)
 library(reshape2)
 library(datasets)
 library(dplyr)
+library(RColorBrewer)
+library(d3heatmap)
 
 # goi_counts<- read.csv("DEseq2 means_goi_ncounts.csv")
 # rownames(goi_counts)<-goi_counts$Gene
@@ -38,7 +40,8 @@ ui<- fluidPage(
     ),
     mainPanel(
       plotOutput("boxplot1"),
-      tableOutput("contents")
+      tableOutput("contents"),
+      plotOutput("d3heatmap")
     )
   )
 )
@@ -47,6 +50,8 @@ ui<- fluidPage(
 server<- function(input,output, session) {
   session$onSessionEnded(stopApp);
   goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
+  changing_lrt_rdl<- read.csv("changing_lrt_rdl.csv");
+  genes_of_interest_means<- read.csv("genes_of_interest_means.csv")
   ({
     # output$contents<- renderTable({
     #    in_counts<-input$counts 
@@ -73,32 +78,26 @@ server<- function(input,output, session) {
         ) +
         scale_color_manual(values = c(brewer.pal(10,"Spectral"),
                                       brewer.pal(10,"Spectral")
-        )
-        ) +
-        theme_bw()
-    })
-    # output$boxplot1<- renderPlot({
-    #   req(input$counts)
-    # melted = melt(df)
-    # boxplot(melted$value ~ melted$Gene, xaxt="n")
-    # text(x = 1:length(levels(melted$Gene)),
-    #      ## Move labels to just below bottom of chart.
-    #      y = par("usr")[3] - 0.90,
-    #      ## Use names from the data list.
-    #      labels = levels(melted$Gene),
-    #      ## Change the clipping region.
-    #      xpd = NA,
-    #      ## Rotate the labels by 35 degrees.
-    #      srt = 35,
-    #      ## Adjust the labels to almost 100% right-justified.
-    #      adj = 0.965,
-    #      ## Increase label size.
-    #      cex = 1)
-    # })
-    # output$ARPE19plot<- renderPlot({
-    #   boxplot(as.formula(formulaText)),
-    #   data= df
-    # })
+        ))
+      })
+    output$d3heatmap<- renderPlot({
+      print("rendering plot")
+      filtered2 = genes_of_interest_means
+      melted2 = melt(genes_of_interest_means)
+      colnames(melted2) <- c("Gene","sample","counts")
+      print(input$sample)
+      filtered2 = melted2[melted2$Gene %in% input$Gene & melted$sample %in% input$sample,]
+      print(filtered2)
+      ggplot(filtered2, 
+             aes(x=sample,y=Gene,
+                 group=counts,
+                 col=Gene, 
+                 # linetype=Gene
+                 )) + 
+        ggtitle ("Means counts of genes of interest") +
+        geom_tile(aes(fill=counts))
+      })
+    
      })
     }
 
