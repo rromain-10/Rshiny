@@ -41,40 +41,6 @@ ui<- fluidPage(
             plotOutput('MAplot4')
             )
   ),
-  # dashboardBody(
-  #     sidebarLayout(
-  #     sidebarPanel(
-  # 
-  #       # selectInput(inputId = "sample1",
-  #       #             label = " Choose sample",
-  #       #             choices=c("ARPE19vsT53D4"="res_ARPE19_vs_T53D4","ARPE19vsRasV12"="res_ARPE19_vs_RasV12", "ARPE19vsAktmyr"="res_ARPE19_vs_Aktmyr","ARPE19vsMekDD"="res_ARPE19_vs_MekDD"
-  #       #                      )
-  #       #             ),
-  # 
-  #       checkboxGroupInput(inputId = "Gene",
-  #                          label = " Choose Gene of Interest",
-  #                          selected=unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
-  #                                                   split=' ')),
-  #                          unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
-  #                                          split=' ')
-  #                          )
-  #       ),
-  #       checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19","RasV12"),
-  #                          c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
-  #       ),
-  #       conditionalPanel(condition = "output.nrows"),
-  #       selectInput(inputId = "All",
-  #                   label = "Select genes from all signficantly changing genes",
-  #                   choices = means_of_changing_genes$X
-  #                  )
-  #       ),
-  # mainPanel(
-  #   plotOutput('plotcounts'),
-  #   plotOutput('boxplot1'),
-  #   plotOutput('pheatmap1')
-  #     )
-  #   )
-  # ),
   
   #heatmap for Genes of interest
   dashboardBody(
