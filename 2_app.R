@@ -22,50 +22,125 @@ library(shinydashboard)
 ## Inputs and Outputs
 ui<- fluidPage(
   titlePanel("ARPE19 progression data view"),
+  
+  fluidRow(
+    
+      column(3, 
+             plotOutput('MAplot1')
+            ),
+      
+      column (3,
+              plotOutput('MAplot2')
+              ),
+     
+     column(3,
+            plotOutput('MAplot3')
+            ),
+     
+     column(3,
+            plotOutput('MAplot4')
+            )
+  ),
+  # dashboardBody(
+  #     sidebarLayout(
+  #     sidebarPanel(
+  # 
+  #       # selectInput(inputId = "sample1",
+  #       #             label = " Choose sample",
+  #       #             choices=c("ARPE19vsT53D4"="res_ARPE19_vs_T53D4","ARPE19vsRasV12"="res_ARPE19_vs_RasV12", "ARPE19vsAktmyr"="res_ARPE19_vs_Aktmyr","ARPE19vsMekDD"="res_ARPE19_vs_MekDD"
+  #       #                      )
+  #       #             ),
+  # 
+  #       checkboxGroupInput(inputId = "Gene",
+  #                          label = " Choose Gene of Interest",
+  #                          selected=unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
+  #                                                   split=' ')),
+  #                          unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
+  #                                          split=' ')
+  #                          )
+  #       ),
+  #       checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19","RasV12"),
+  #                          c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+  #       ),
+  #       conditionalPanel(condition = "output.nrows"),
+  #       selectInput(inputId = "All",
+  #                   label = "Select genes from all signficantly changing genes",
+  #                   choices = means_of_changing_genes$X
+  #                  )
+  #       ),
+  # mainPanel(
+  #   plotOutput('plotcounts'),
+  #   plotOutput('boxplot1'),
+  #   plotOutput('pheatmap1')
+  #     )
+  #   )
+  # ),
+  
+  #heatmap for Genes of interest
   dashboardBody(
     sidebarLayout(
-    sidebarPanel(
-      
-      # selectInput(inputId = "sample1",
-      #             label = " Choose sample",
-      #             choices=c("ARPE19vsT53D4"="res_ARPE19_vs_T53D4","ARPE19vsRasV12"="res_ARPE19_vs_RasV12", "ARPE19vsAktmyr"="res_ARPE19_vs_Aktmyr","ARPE19vsMekDD"="res_ARPE19_vs_MekDD"
-      #                      )
-      #             ),
-
-      checkboxGroupInput(inputId = "Gene", 
-                         label = " Choose Gene of Interest",
-                         selected=unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
-                                                  split=' ')),
-                         unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
-                                         split=' ')
-                         )
-      ),
-      checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19","RasV12"),
-                         c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
-      ),
-      conditionalPanel(condition = "output.nrows"),
-      selectInput(inputId = "All",
-                  label = "Select genes from all signficantly changing genes",
-                  choices = means_of_changing_genes$X
+      sidebarPanel(
+  
+        #heatmap for Genes of interest
+        checkboxGroupInput(inputId = "Gene",
+                           label = " Choose Gene of Interest",
+                           selected=unlist(strsplit('AURKB NUF2 PPP1CB PPP1CC PPP2R5B PPP2R5D SGO1 SKA1',
+                                                    split=' ')),
+                           unlist(strsplit('AURKB NUF2 PPP1CB PPP1CC PPP2R5B PPP2R5D SGO1 SKA1',
+                                           split=' ')
+                           )
+        ),
+        
+        checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19","RasV12"),
+                           c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+                          )
+        ),
+      mainPanel(
+        plotOutput('pheatmap1')
+            )
+    )
+   ),
+  
+  #heatmap for significantly changing genes 
+  dashboardBody(
+      sidebarLayout(
+      sidebarPanel(
+        checkboxGroupInput(inputId = "sample1", label = " Choose sample", selected=c("ARPE19","RasV12"),
+                           c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+        ),
+        
+        conditionalPanel(condition = "output.nrows"),
+        selectInput(inputId = "All",
+                    label = "Select genes from all signficantly changing genes",
+                    choices = means_of_changing_genes$X
+                   )
+        ),
+  mainPanel(
+    plotOutput('pheatmap2')
       )
-      # selectInput(inputId = "reps",
-      #             label = "Select genes from all signficantly changing genes",
-      #             choices = changing_lrt_rdl
-      #             )
+    )
+  ),
+  #boxplot for significantly changing genes 
+  dashboardBody(
+    sidebarLayout(
+      sidebarPanel(
+        checkboxGroupInput(inputId = "sample2", label = " Choose sample", selected=c("ARPE19","RasV12"),
+                           c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+        ),
+        
+        checkboxGroupInput(inputId = "gene1", 
+                           label = " Choose Gene of Interest",
+                           unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
+                                           split=' ')
+        )
+      )
     ),
-    mainPanel(
-      plotOutput("MAplot"),
-      plotOutput("plotcounts"),
-      tableOutput("contents"),
-      plotOutput("pheatmap1"),
-      plotOutput("pheatmap2"),
-      plotOutput("pheatmap3"),
-      plotOutput("boxplot1")
+  mainPanel(
+    plotOutput('boxplot1')
+        )
       )
     )
   )
-)
-
 
 
 
@@ -79,10 +154,12 @@ server<- function(input,output, session) {
   ncounts_goi_no_genecol<- read.csv("ncounts_goi_no_genecol.csv");
   normalized_genecounts<- read.csv("normalized_genecounts.csv")
   dds<- readRDS("dds.RDS")
+  dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
+  dds$sample
   cts<- readRDS("cts.RDS")
   res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
   res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
-  res_ARPE19_vs_Rasv12<- readRDS ('res/res_ARPE19_vs_Rasv12')
+  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_Rasv12')
   res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
   res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
   selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
@@ -100,157 +177,121 @@ server<- function(input,output, session) {
   
   #Genes assocaited with T53D4
   T53D4_genes=c('CDK4', 'TP53')
-  
-  ({
+  # 
+  # library(GenomicFeatures)
+  # library(ensembldb)
+  # library(biomaRt)
+  # ensembl = useDataset("hsapiens_gene_ensembl",mart=useMart("ENSEMBL_MART_ENSEMBL"))
+  # ctsnames = rownames(cts)
+  # 
+  # # figure out filter,values,and attributes at http://www.ensembl.org/biomart/martview
+  # gene_names = getBM(mart = ensembl, filter='ensembl_gene_id', value=ctsnames, attributes=c('external_gene_name', 'ensembl_gene_id'))
+  # dim(gene_names) # 20002     2
+  # length(ctsnames) # 20003
+  # ctsnames = ctsnames[ ctsnames %in%  gene_names$ensembl_gene_id] # only one gene not found- ENSG00000254462, and it's all 0s
+  # length(ctsnames) # 20002
+  # rownames(gene_names) <- gene_names$ensembl_gene_id
+  # gene_names = gene_names[ctsnames,]
+  # cts=cts[rownames(cts) != 'ENSG00000254462',]# take out the 0 count gene
+  # rownames(cts) <- gene_names$external_gene_name
     
-    #MAplot 
-    output$MAplot <- renderPlot ({
-      print("rendering plot")
+  ({
+  
+    #MAplots ARPE19 vs T53D4 
+    output$MAplot1 <- renderPlot ({
+      print("rendering plot: MAplot ARPE19 vs T53D4")
+      #ARPE19 vs T53D4 plots##
       par(mfrow=c(1,1))
       #print(input$sample1)
-      plotMA(res_T53D4_vs_MekDD, main="T53D4 vs MekDD", ylim = c(-20,20),
-             ylab = "log fold change (ratio of normalized T53D4 / MekDD)",
+      plotMA(res_ARPE19_vs_T53D4, main="ARPE19 vs T53D4", ylim = c(-20,20),
+             ylab = "log fold change (ratio of normalized ARPE19 / T53D4)",
              xlab = "means of normalized counts",
-             cex.main= 3,
+             cex.main= 2,
              cex= 0.5,
-             alpha= 0.5)
-       with(res_T53D4_vs_MekDD [selectedGenes, ],
-            { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-                     lwd=2)
-              text(baseMean,log2FoldChange,
-                   selectedGenes, pos=2, col="dodgerblue")})
-       with(res_T53D4_vs_MekDD [Mek_genes, ],
-            { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-                     lwd=2)
-              text(baseMean,log2FoldChange, Ras_genes, pos=2, col="dodgerblue")})
-
-       plotMA(res_T53D4_vs_MekDD, main="T53D4 vs MekDD\nshrunken", ylim = c(-7,7),
-             ylab = "log fold change (ratio of normalized T53D4 / MekDD)",
-            xlab = "means of normalized counts")
-       
-       # #Identify genes on the plot ARPE19 vs Aktmyr
-       # #  Step1 -> execute idx code line below. 
-       # #  Step2 -> Click on a dot in the plot. 
-       # # Step3 -> To finish, click on "finish" in the upper right hand corner of the plot
-       #  idx <- identify(res_T53D4_vs_MekDD$baseMean,res_T53D4_vs_MekDD$log2FoldChange, labels = gene_names$external_gene_name)
-       #  #  Step4 -> click here to see what you got!
-       #  rownames(res_T53D4_vs_MekDD)[idx]
-       
+             alpha=0.5)
+      # with(res_ARPE19_vs_T53D4 [selectedGenes, ],
+      #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+      #               lwd=2)
+      #        text(baseMean,log2FoldChange,
+      #             selectedGenes, pos=2, col="dodgerblue")})
+      # with(res_ARPE19_vs_T53D4 [T53D4_genes, ],
+      #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+      #               lwd=2)
+      #        text(baseMean,log2FoldChange, T53D4_genes, pos=2, col="dodgerblue")})
     })
        
-       output$MAplot <- renderPlot ({
-      #ARPE19 vs T53D4 plots##
-       par(mfrow=c(1,1))
-       #print(input$sample1)
-       plotMA(res_ARPE19_vs_T53D4, main="ARPE19 vs T53D4", ylim = c(-20,20),
-              ylab = "log fold change (ratio of normalized ARPE19 / T53D4)",
-              xlab = "means of normalized counts",
-              cex.main= 3,
-              cex= 0.5,
-              alpha=0.5)
-       with(res_ARPE19_vs_T53D4 [selectedGenes, ],
-            { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-                     lwd=2)
-              text(baseMean,log2FoldChange,
-                   selectedGenes, pos=2, col="dodgerblue")})
-       with(res_ARPE19_vs_T53D4 [T53D4_genes, ],
-            { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-                     lwd=2)
-              text(baseMean,log2FoldChange, T53D4_genes, pos=2, col="dodgerblue")})
+    #MAplots ARPE19 vs RasV12    
+    output$MAplot2 <- renderPlot ({
+        print("rendering plot: MAplot ARPE19 vs RasV12")
+         ##ARPE19 vs RasV12 plots##
+         par(mfrow=c(1,1))
+         #print(input$sample1)
+         plotMA(res_ARPE19_vs_RasV12, main="ARPE19 vs RasV12", ylim = c(-20,20),
+                ylab = "log fold change (ratio of normalized ARPE19 / RasV12)",
+                xlab = "means of normalized counts",
+                cex.main= 2,
+                cex= 0.5,
+                alpha= 0.5)
+         # with(res_ARPE19_vs_RasV12 [selectedGenes, ],
+         #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+         #               lwd=2)
+         #        text(baseMean,log2FoldChange,
+         #             selectedGenes, pos=2, col="dodgerblue")})
+         # with(res_ARPE19_vs_RasV12 [Ras_genes, ],
+         #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+         #               lwd=2)
+         #        text(baseMean,log2FoldChange,
+         #             Ras_genes, pos=2, col="dodgerblue")})
        })
        
-    #    ##ARPE19 vs RasV12 plots##
-    #    par(mfrow=c(1,1))
-    #    #print(input$sample1)
-    #    plotMA(res_ARPE19_vs_RasV12, main="ARPE19 vs RasV12", ylim = c(-20,20),
-    #           ylab = "log fold change (ratio of normalized ARPE19 / RasV12)",
-    #           xlab = "means of normalized counts",
-    #           cex.main= 3,
-    #           cex= 0.5,
-    #           alpha= 0.5)
-    #    with(res_ARPE19_vs_RasV12 [selectedGenes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange,
-    #                selectedGenes, pos=2, col="dodgerblue")})
-    #    with(res_ARPE19_vs_RasV12 [Ras_genes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange,
-    #                Ras_genes, pos=2, col="dodgerblue")})
-    #    
-    #    ##ARPE19 vs MekDD plots##
-    #    par(mfrow=c(1,1))
-    #    #print(input$sample1)
-    #    plotMA(res_ARPE19_vs_MekDD, main="ARPE19 vs MekDD", ylim = c(-20,20),
-    #           ylab = "log fold change (ratio of normalized ARPE19 / MekDD)",
-    #           xlab = "means of normalized counts",
-    #           cex.main= 3,
-    #           cex= 0.5,
-    #           alpha= 0.5)
-    #    with(res_ARPE19_vs_MekDD [selectedGenes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange,
-    #                selectedGenes, pos=2, col="dodgerblue")})
-    #    with(res_ARPE19_vs_MekDD [Mek_genes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange, Mek_genes, pos=2, col="dodgerblue")})
-    #    
-    #    ##ARPE19 vs Aktmyr plots##
-    #    par(mfrow=c(1,1))
-    #    #print(input$sample1)
-    #    plotMA(res_ARPE19_vs_Aktmyr, main="ARPE19 vs Aktmyr ", ylim = c(-20,20),
-    #           ylab = "log fold change (ratio of normalized ARPE19 / Aktmyr)",
-    #           xlab = "means of normalized counts",
-    #           cex.main= 3,
-    #           cex= 0.5,
-    #           alpha= 0.5)
-    #    with(res_ARPE19_vs_Aktmyr [selectedGenes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange, selectedGenes, pos=2, col="dodgerblue")})
-    #    with(res_ARPE19_vs_Aktmyr [Akt_genes, ],
-    #         { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
-    #                  lwd=2)
-    #           text(baseMean,log2FoldChange, Akt_genes, pos=2, col="dodgerblue")})
-    #    
-    #    
-    # })
-    
-    #Plotcounts
-    output$plotcounts<- renderPlot ({
-      print("rendering plot")
-      #Reorder samples to match experimental design
-      dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
-      dds$sample
-            #HRAS
-      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      pc_HRAS1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      ggplot (pc_BUB1,aes(x=sample,y=count)) +
-        geom_boxplot(aes(fill=sample, alpha=0.9))+ geom_jitter() +
-        scale_y_log10() + stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
-        ggtitle("HRAS expression")
-    })
+    #MAplots ARPE19 vs MekDD 
+    output$MAplot3 <- renderPlot ({
+       print("rendering plot: MAplot ARPE19 vs MekDD")
+       ##ARPE19 vs MekDD plots##
+       par(mfrow=c(1,1))
+       #print(input$sample1)
+       plotMA(res_ARPE19_vs_MekDD, main="ARPE19 vs MekDD", ylim = c(-20,20),
+              ylab = "log fold change (ratio of normalized ARPE19 / MekDD)",
+              xlab = "means of normalized counts",
+              cex.main= 2,
+              cex= 0.5,
+              alpha= 0.5)
+       # with(res_ARPE19_vs_MekDD [selectedGenes, ],
+       #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+       #               lwd=2)
+       #        text(baseMean,log2FoldChange,
+       #             selectedGenes, pos=2, col="dodgerblue")})
+       # with(res_ARPE19_vs_MekDD [Mek_genes, ],
+       #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+       #               lwd=2)
+       #        text(baseMean,log2FoldChange, Mek_genes, pos=2, col="dodgerblue")})
+       
+       })
+      
+    #MAplots ARPE19 vs Aktmyr  
+    output$MAplot4 <- renderPlot ({
+      print("rendering plot: MAplot ARPE19 vs Akymyr")
+       ##ARPE19 vs Aktmyr plots##
+       par(mfrow=c(1,1))
+       #print(input$sample1)
+       plotMA(res_ARPE19_vs_Aktmyr, main="ARPE19 vs Aktmyr ", ylim = c(-20,20),
+              ylab = "log fold change (ratio of normalized ARPE19 / Aktmyr)",
+              xlab = "means of normalized counts",
+              cex.main= 2,
+              cex= 0.5,
+              alpha= 0.5)
+       # with(res_ARPE19_vs_Aktmyr [selectedGenes, ],
+       #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+       #               lwd=2)
+       #        text(baseMean,log2FoldChange, selectedGenes, pos=2, col="dodgerblue")})
+       # with(res_ARPE19_vs_Aktmyr [Akt_genes, ],
+       #      { points(baseMean,log2FoldChange, col= "dodgerblue", cex=1,
+       #               lwd=2)
+       #        text(baseMean,log2FoldChange, Akt_genes, pos=2, col="dodgerblue")})
 
-    #heatmap showing mean counts for ALL significantly changing genes
-    output$boxplot1<- renderPlot({
-      print("rendering plot")
-      filtered4 = normalized_genecounts
-      melted4 = melt(normalized_genecounts)
-      colnames(melted4) <- c("Gene","sample","counts")
-      print(input$sample)
-      filtered4 = melted4[melted4$Gene %in% input$All & melted4$sample %in% input$sample,]
-      print(filtered4)
-      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      pc_AKT1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      ggplot (pc_BUB1,aes(x=sample,y=count)) +
-        geom_boxplot(aes(fill=sample, alpha=0.9))+ stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
-        geom_jitter()+scale_y_log10()
+
     })
-    
-    
+  
     #heatmap showing mean counts of significantly changing genes of interest
     output$pheatmap1<- renderPlot({
       print("rendering plot")
@@ -276,8 +317,8 @@ server<- function(input,output, session) {
       filtered3 = means_of_changing_genes
       melted3 = melt(means_of_changing_genes)
       colnames(melted3) <- c("Gene","sample","counts")
-      print(input$sample)
-      filtered3 = melted3[melted3$Gene %in% input$All & melted3$sample %in% input$sample,]
+      print(input$sample1)
+      filtered3 = melted3[melted3$Gene %in% input$All & melted3$sample %in% input$sample1,]
       print(filtered3)
       ggplot(filtered3, 
              aes(x=sample,y=Gene,
@@ -287,8 +328,40 @@ server<- function(input,output, session) {
         ggtitle ("Means counts for all significantly changing genes")+
         theme_classic()
       })
-
-      })
+    
+    #Plotcounts
+    output$plotcounts<- renderPlot ({
+      print("rendering plot")
+      #Reorder samples to match experimental design
+      dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
+      dds$sample
+      #HRAS
+      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = F)
+      # pc_HRAS1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
+      # ggplot (pc_BUB1,aes(x=sample,y=count)) +
+      #   geom_boxplot(aes(fill=sample, alpha=0.9))+ geom_jitter() +
+      #   scale_y_log10() + stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
+      #   ggtitle("HRAS expression")
+    })
+    
+    #heatmap showing mean counts for ALL significantly changing genes
+    output$boxplot1<- renderPlot({
+      print("rendering plot")
+      filtered4 = normalized_genecounts
+      melted4 = melt(normalized_genecounts)
+      colnames(melted4) <- c("Gene","sample","counts")
+      print(input$sample2)
+      print(input$gene2)
+      filtered4 = melted4[melted4$Gene %in% input$All & melted4$sample %in% input$sample2,]
+      print(filtered4)
+      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
+      pc_AKT1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
+      ggplot (pc_BUB1,aes(x=sample,y=count)) +
+        geom_boxplot(aes(fill=sample, alpha=0.9))+ stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
+        geom_jitter()+scale_y_log10()
+    })
+    
+     })
     }
 
 
