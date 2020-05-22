@@ -313,8 +313,8 @@ server<- function(input,output, session) {
     #heatmap showing mean counts for ALL significantly changing genes
     output$boxplot1<- renderPlot({
       print("rendering plot")
-      filtered4 = normalized_genecounts
-      melted4 = melt(normalized_genecounts)
+      filtered4 = dds
+      melted4 = melt(dds)
       colnames(melted4) <- c("Gene","sample","counts")
       print(input$sample2)
       print(input$gene2)
