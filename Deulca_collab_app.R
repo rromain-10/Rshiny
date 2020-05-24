@@ -1,12 +1,28 @@
-install.packages('shinydashboard')
-# install.packages('rsconnect')
-# rsconnect::setAccountInfo(name='rromain-10', 
-#                           token='708AE86DD216401F0304DE58972E2A49', 
-#                           secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
-# library(rsconnect)
-# getwd()
-#rsconnect::deployApp('/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny/2_app.R')
+---
+title: "ARPE19"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
 
+install.packages("rmarkdown")
+
+```{r include=F}
+knitr::opts_chunk$set (echo=F)
+```
+
+```{r packages}
+install.packages('png')
+install.packages('d3heatmap')
+install.packages('shinydashboard')
+install.packages('rsconnect')
+rsconnect::setAccountInfo(name='rromain-10',
+                          token='708AE86DD216401F0304DE58972E2A49',
+                          secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
+library(rsconnect)
+getwd()
+rsconnect::deployApp('/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny/2_app.R')
 
 library(shiny)
 library(ggplot2)
@@ -17,11 +33,27 @@ library(RColorBrewer)
 library(pheatmap)
 library(DESeq2)
 library(shinydashboard)
+library(d3heatmap)
+library(png)
+```
 
 
-## Inputs and Outputs
+
+```{r Inputs and outputs}
 ui<- fluidPage(
-  titlePanel("ARPE19 progression data view"),
+  titlePanel("ARPE (human retinal cells) progression data view"),
+  dashboardBody( "
+                 
+                 This app shows RNA sequencing data analysis for the Deluca lab's
+                 ARPE19 cell line progression model.
+                 
+                 "
+  ),
+  
+    dashboardBody(
+    
+    "MAplots displayed below shows significant up or down regulation of expressed genes, where the comparsions are between plot titles lited (lfc=0.01)  "
+  ),
   
   fluidRow(
     
@@ -42,6 +74,32 @@ ui<- fluidPage(
             )
   ),
   
+  dashboardBody(
+    
+    "The figure below displays nomralized counts in boxplot format showing interquartiles ranges, outliers, median and mean for the gene of choice across the 5 sample progressive cel line.  "
+  ),
+  
+  #boxplot for significantly changing genes 
+  dashboardBody(
+      sidebarLayout(
+      sidebarPanel(
+        
+        conditionalPanel(condition = "output.nrows"),
+        selectInput(inputId = "All",
+                    label = "Select genes from all signficantly changing genes",
+                    choices = means_of_changing_genes$X
+                   )
+        ),
+  mainPanel(
+    plotOutput('boxplot1')
+      )
+    )
+  ),
+  
+   dashboardBody(
+    
+    "The figure below displays a heatmap shwoing gene expression for ONLY genes of interest that are significantly changing (lfc=0.01 & padj<0.1).  "
+    ),  
   #heatmap for Genes of interest
   dashboardBody(
     sidebarLayout(
@@ -67,49 +125,56 @@ ui<- fluidPage(
     )
    ),
   
-  #heatmap for significantly changing genes 
   dashboardBody(
-      sidebarLayout(
-      sidebarPanel(
-        checkboxGroupInput(inputId = "sample1", label = " Choose sample", selected=c("ARPE19","RasV12"),
-                           c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
-        ),
-        
-        conditionalPanel(condition = "output.nrows"),
-        selectInput(inputId = "All",
-                    label = "Select genes from all signficantly changing genes",
-                    choices = means_of_changing_genes$X
-                   )
-        ),
-  mainPanel(
-    plotOutput('pheatmap2')
-      )
-    )
-  ),
-  #boxplot for significantly changing genes 
+    
+    "The figure below displays a heatmap shwoing gene expression for ALL genes that are significantly changing in the entire dataset (lfc=0.01 & padj<0.1).  "
+    ),   
+
+  #heatmap for Genes of interest
   dashboardBody(
     sidebarLayout(
       sidebarPanel(
         checkboxGroupInput(inputId = "sample2", label = " Choose sample", selected=c("ARPE19","RasV12"),
                            c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+                          )
         ),
-        
-        checkboxGroupInput(inputId = "gene1", 
-                           label = " Choose Gene of Interest",
-                           unlist(strsplit('AURKB BUB1 BUB1B NUF2 PPP1CA PPP1CB PPP1CC PPP2R2A PPP2R2A.1 PPP2R5A PPP2R5B PPP2R5C PPP2R5D PPP2R5E SGO1 SKA1 SKA2',
-                                           split=' ')
-        )
-      )
-    ),
-  mainPanel(
-    plotOutput('boxplot1')
-        )
-      )
+      mainPanel(
+        renderPlot('whole_heatmap')
+            )
     )
-  )
+   ),
+  
+  #boxplot for significantly changing genes 
+  dashboardBody(
+    sidebarLayout(
+      sidebarPanel(
+                    
+        conditionalPanel(condition = "output.nrows"),
+        selectInput(inputId = "sig_chan",
+                    label = "Select genes from all signficantly changing genes",
+                    choices = changing_lrt_rdl$X
+          ),
+        
+     checkboxGroupInput(inputId = "sample1", label = " Choose sample", selected=c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD"),
+                           c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
+                          )
+        ),
+  mainPanel(
+    plotOutput('heatmap2')
+          )
+       )
+     )
+   )
+   
+
+```
 
 
 
+
+
+
+```{r figures and displays}
 server<- function(input,output, session) {
   session$onSessionEnded(stopApp);
   ##files needed
@@ -128,6 +193,7 @@ server<- function(input,output, session) {
   res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_Rasv12')
   res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
   res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
+  means_ALL_sigchanging_genes_heatmap <- readPNG('20200221_means_changing_genes.png')
   selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
                     'PPP2R5B','PPP2R2A','PPP2R2A','PPP2R5D','PPP2R5A','PPP2R5E',
                     'PPP1CA','PPP1CC','PPP1CB','HEC1','NUF2','SPC24','SPC25')
@@ -143,24 +209,7 @@ server<- function(input,output, session) {
   
   #Genes assocaited with T53D4
   T53D4_genes=c('CDK4', 'TP53')
-  # 
-  # library(GenomicFeatures)
-  # library(ensembldb)
-  # library(biomaRt)
-  # ensembl = useDataset("hsapiens_gene_ensembl",mart=useMart("ENSEMBL_MART_ENSEMBL"))
-  # ctsnames = rownames(cts)
-  # 
-  # # figure out filter,values,and attributes at http://www.ensembl.org/biomart/martview
-  # gene_names = getBM(mart = ensembl, filter='ensembl_gene_id', value=ctsnames, attributes=c('external_gene_name', 'ensembl_gene_id'))
-  # dim(gene_names) # 20002     2
-  # length(ctsnames) # 20003
-  # ctsnames = ctsnames[ ctsnames %in%  gene_names$ensembl_gene_id] # only one gene not found- ENSG00000254462, and it's all 0s
-  # length(ctsnames) # 20002
-  # rownames(gene_names) <- gene_names$ensembl_gene_id
-  # gene_names = gene_names[ctsnames,]
-  # cts=cts[rownames(cts) != 'ENSG00000254462',]# take out the 0 count gene
-  # rownames(cts) <- gene_names$external_gene_name
-    
+  
   ({
   
     #MAplots ARPE19 vs T53D4 
@@ -257,6 +306,23 @@ server<- function(input,output, session) {
 
 
     })
+    
+        #heatmap showing mean counts for ALL significantly changing genes of interest
+    output$boxplot1<- renderPlot({
+      print("rendering plot")
+      print(input$All)
+      #Reorder samples to match experimental design
+      dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
+      dds$sample
+      #AKT1
+      plotCounts(dds, gene=print(input$All) ,intgroup = c("sample"),cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
+      pc<-plotCounts(dds, gene=print(input$All), intgroup =c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData=T)
+      ggplot (pc,aes(x=sample,y=count)) +
+        geom_boxplot(aes(fill=sample, alpha=0.9))+ stat_summary( geom="point", shape=20, size=5,color="red", fill="red") +
+        geom_jitter()+scale_y_log10() + 
+        ggtitle("Gene expression")
+      
+    })
   
     #heatmap showing mean counts of significantly changing genes of interest
     output$pheatmap1<- renderPlot({
@@ -277,59 +343,50 @@ server<- function(input,output, session) {
         theme_classic()
       })
     
-    #heatmap showing mean counts for ALL significantly changing genes of interest
-    output$pheatmap2<- renderPlot({
+    output$whole_heatmap<- renderPlot ({
+      print("rendering plot")
+      filtered4 = means_of_changing_genes
+      melted4 = melt(means_of_changing_genes)
+      colnames(melted4) <- c("Gene","sample","counts")
+      filtered4 = melted4[ melted4$sample %in% input$sample,]
+      ggplot(filtered4, 
+             aes(x=sample,y=Gene,
+                 group=counts,
+                 col=Gene)) + 
+        ggtitle ("Mean counts of significantly changing genes of interest") +
+        geom_raster(aes(fill=log10(counts))) +
+        scale_fill_gradient(low = "blue", high = "red")+
+        theme_classic()
+      })
+    
+    
+    #Heatmap
+     output$heatmap2<- renderPlot ({
       print("rendering plot")
       filtered3 = means_of_changing_genes
       melted3 = melt(means_of_changing_genes)
       colnames(melted3) <- c("Gene","sample","counts")
       print(input$sample1)
-      filtered3 = melted3[melted3$Gene %in% input$All & melted3$sample %in% input$sample1,]
+      print(input$sig_chan)
+      filtered3 = melted3[melted3$Gene %in% input$sig_chan & melted3$sample %in% input$sample1,]
       print(filtered3)
       ggplot(filtered3, 
              aes(x=sample,y=Gene,
                  group=counts,
                  col=Gene)) + 
-        geom_raster(aes(fill=log10(counts))) +
-        ggtitle ("Means counts for all significantly changing genes")+
+        ggtitle ("Mean counts of significantly changing genes of interest") +
+        geom_raster(aes(fill=counts)) +
+        scale_fill_gradient(low = "blue", high = "red")+
         theme_classic()
-      })
-    
-    #Plotcounts
-    output$plotcounts<- renderPlot ({
-      print("rendering plot")
-      #Reorder samples to match experimental design
-      dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
-      dds$sample
-      #HRAS
-      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = F)
-      # pc_HRAS1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="HRAS"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      # ggplot (pc_BUB1,aes(x=sample,y=count)) +
-      #   geom_boxplot(aes(fill=sample, alpha=0.9))+ geom_jitter() +
-      #   scale_y_log10() + stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
-      #   ggtitle("HRAS expression")
-    })
-    
-    #heatmap showing mean counts for ALL significantly changing genes
-    output$boxplot1<- renderPlot({
-      print("rendering plot")
-      filtered4 = dds
-      melted4 = melt(dds)
-      colnames(melted4) <- c("Gene","sample","counts")
-      print(input$sample2)
-      print(input$gene2)
-      filtered4 = melted4[melted4$Gene %in% input$All & melted4$sample %in% input$sample2,]
-      print(filtered4)
-      plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      pc_AKT1<-plotCounts(dds, gene=which(rownames(normalized_genecounts)=="AKT1"),intgroup = c("sample"), cex.main=2, cex=1.5, xlab= "Sample", returnData = T)
-      ggplot (pc_BUB1,aes(x=sample,y=count)) +
-        geom_boxplot(aes(fill=sample, alpha=0.9))+ stat_summary( geom="point", shape=20, size=5, color="red", fill="red") +
-        geom_jitter()+scale_y_log10()
-    })
-    
      })
-    }
+    })
+  }
+```
 
 
+```{r App}
 shinyApp(ui=ui, server=server)
+```
+
+
 
