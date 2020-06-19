@@ -6,24 +6,21 @@ output:
     df_print: paged
 ---
 
-install.packages("rmarkdown")
+#install.packages("rmarkdown")
+#install.packages('rsconnect')
 
 ```{r include=F}
 knitr::opts_chunk$set (echo=F)
 ```
 
 ```{r packages}
-#install.packages('png')
-#install.packages('d3heatmap')
-#install.packages('shinydashboard')
-# install.packages('rsconnect')
-# rsconnect::setAccountInfo(name='rromain-10', 
-#                           token='708AE86DD216401F0304DE58972E2A49', 
-#                           secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
-# library(rsconnect)
-# getwd()
-#rsconnect::deployApp('/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny/2_app.R')
+#install.packages('devtools')
 
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+# BiocManager::install()
+
+#library(devtools)
 library(shiny)
 library(ggplot2)
 library(reshape2)
@@ -33,8 +30,7 @@ library(RColorBrewer)
 library(pheatmap)
 library(DESeq2)
 library(shinydashboard)
-library(d3heatmap)
-library(png)
+
 ```
 
 
@@ -115,7 +111,7 @@ ui<- fluidPage(
                            )
         ),
         
-        checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19","RasV12"),
+        checkboxGroupInput(inputId = "sample", label = " Choose sample", selected=c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD"),
                            c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
                           )
         ),
@@ -134,12 +130,12 @@ ui<- fluidPage(
   dashboardBody(
     sidebarLayout(
       sidebarPanel(
-        checkboxGroupInput(inputId = "sample2", label = " Choose sample", selected=c("ARPE19","RasV12"),
+        checkboxGroupInput(inputId = "sample2", label = " Choose sample", selected=c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD"),
                            c("ARPE19", "T53D4", "RasV12","Aktmyr" ,"MekDD")
                           )
         ),
       mainPanel(
-        renderPlot('whole_heatmap')
+        plotOutput('whole_heatmap')
             )
     )
    ),
@@ -190,10 +186,9 @@ server<- function(input,output, session) {
   cts<- readRDS("cts.RDS")
   res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
   res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
-  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_Rasv12')
+  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_RasV12')
   res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
   res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
-  means_ALL_sigchanging_genes_heatmap <- readPNG('20200221_means_changing_genes.png')
   selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
                     'PPP2R5B','PPP2R2A','PPP2R2A','PPP2R5D','PPP2R5A','PPP2R5E',
                     'PPP1CA','PPP1CC','PPP1CB','HEC1','NUF2','SPC24','SPC25')
@@ -336,27 +331,30 @@ server<- function(input,output, session) {
       ggplot(filtered2, 
              aes(x=sample,y=Gene,
                  group=counts,
-                 col=Gene)) + 
+                 col=Gene,
+                 fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
-        geom_raster(aes(fill=log10(counts))) +
-        scale_fill_gradient(low = "green", high = "red")+
-        theme_classic()
+        geom_raster() +
+        scale_fill_viridis()+
+        theme_minimal()
       })
     
     output$whole_heatmap<- renderPlot ({
       print("rendering plot")
-      filtered4 = means_of_changing_genes
-      melted4 = melt(means_of_changing_genes)
+      filtered4 = means_of_changing_genes2
+      melted4 = melt(means_of_changing_genes2)
       colnames(melted4) <- c("Gene","sample","counts")
-      filtered4 = melted4[ melted4$sample %in% input$sample,]
+      print(input$sample2)
+      filtered4 = melted4[ melted4$sample %in% input$sample2,]
       ggplot(filtered4, 
              aes(x=sample,y=Gene,
-                 group=counts,
-                 col=Gene)) + 
+                 group =Gene,
+                 col = sample,
+                 fill= counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
-        geom_raster(aes(fill=log10(counts))) +
+        geom_tile() +
         scale_fill_gradient(low = "blue", high = "red")+
-        theme_classic()
+        theme_minimal()
       })
     
     
@@ -372,12 +370,15 @@ server<- function(input,output, session) {
       print(filtered3)
       ggplot(filtered3, 
              aes(x=sample,y=Gene,
-                 group=counts,
-                 col=Gene)) + 
+                 group=Gene,
+                 col=sample,
+                 fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
-        geom_raster(aes(fill=counts)) +
-        scale_fill_gradient(low = "blue", high = "red")+
-        theme_classic()
+        geom_tile() +
+        scale_fill_viridis() +
+        theme_minimal()
+      
+      
      })
     })
   }
@@ -388,5 +389,14 @@ server<- function(input,output, session) {
 shinyApp(ui=ui, server=server)
 ```
 
+```{r}
+# rsconnect::setAccountInfo(name='onishlab',
+#                          token='0AF9850962CCB0641D2DB5E43B4AFA8E',
+#                          secret='xtoBU96rxwjtBShyzmd5WhbrQy/xzwgdvfsF5zpr')
+# 
+# library(rsconnect)
+# getwd()
+rsconnect::deployApp(".", appTitle = 'ARPE19 cancer cell progression app', account = 'onishlab')
+```
 
 
