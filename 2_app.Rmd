@@ -146,8 +146,8 @@ server<- function(input,output, session) {
   dds$sample
   cts<- readRDS("cts.RDS")
   res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
-  res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
-  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_Rasv12')
+  res_ARPE19_vs_T53D4<- readRDS('res/res_ARPE19_vs_T53D4')
+  res_ARPE19_vs_RasV12<- readRDS('res/res_ARPE19_vs_Rasv12')
   res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
   res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
   selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
