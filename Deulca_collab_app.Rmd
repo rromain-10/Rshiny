@@ -34,7 +34,9 @@ library(shinydashboard)
 library(viridis)
 library(tidyr)
 library(d3heatmap)
+library(plotly)
 library(heatmaply)
+library(DT)
 ```
 
 
@@ -52,7 +54,7 @@ ui<- fluidPage(
   
     dashboardBody(
       
-      "__________________________________________________________________________________________________________________________________________________",
+      "______________________________________________________________________________________________________________________________________________________________________________________________________",
       
     "MAplots displayed below shows significant up or down regulation of expressed genes, where the comparsions are between plot titles lited (lfc=0.01)  "
   ),
@@ -78,7 +80,7 @@ ui<- fluidPage(
   
   dashboardBody(
     
-  "__________________________________________________________________________________________________________________________________________________",
+  "__________________________________________________________________________________________________________________________________________________________________________________________________________",
     
     "The figure below displays nomralized counts in boxplot format showing interquartiles ranges, outliers, median and mean for the gene of choice across the 5 sample progressive cel line.  "
   ),
@@ -102,7 +104,7 @@ ui<- fluidPage(
   
    dashboardBody(
      
-       "__________________________________________________________________________________________________________________________________________________",
+       "_____________________________________________________________________________________________________________________________________________________________________________________________________",
     
     "The figure below displays a heatmap shwoing gene expression for ONLY genes of interest that are significantly changing (lfc=0.01 & padj<0.1).  "
     ),  
@@ -133,7 +135,7 @@ ui<- fluidPage(
   
   dashboardBody(
     
-    "__________________________________________________________________________________________________________________________________________________",
+    "________________________________________________________________________________________________________________________________________________________________________________________________________",
     
     "The figure below displays a heatmap shwoing gene expression for ALL genes that are significantly changing in the entire dataset (lfc=0.01 & padj<0.1).  "
     ),   
@@ -154,21 +156,20 @@ ui<- fluidPage(
   
   dashboardBody(
     
-    "_________________________________________________________________________________________________________________",
+    "________________________________________________________________________________________________________________________________________________________________________________________________________",
     
-    "The figure below displays a heatmap shwoing gene expression for ALL genes that are significantly changing in the entire dataset (lfc=0.01 & padj<0.1).  "
+    "The data tables shows the cluster each gene is associated with from the heatmap above. Cluster 1 is the first cluster of the heatmap and counts downwards to 7 "
     ),   
 
-  #interactive heatmap for Genes of interest
   dashboardBody(
     sidebarLayout(
       sidebarPanel(
         checkboxGroupInput( inputId = 'none',
-                            label = 'Heatmap'
+                            label = 'Type gene name into search bar to see associated cluster'
                           )
         ),
       mainPanel(
-        d3heatmapOutput('whole_heatmap_d3')
+        DT::dataTableOutput('gene_div')
             )
     )
    ),
@@ -176,7 +177,7 @@ ui<- fluidPage(
   #boxplot for significantly changing genes 
   dashboardBody(
     
-      "__________________________________________________________________________________________________________________________________________________",
+      "______________________________________________________________________________________________________________________________________________________________________________________________________",
     
     sidebarLayout(
       sidebarPanel(
@@ -210,12 +211,13 @@ ui<- fluidPage(
 server<- function(input,output, session) {
   session$onSessionEnded(stopApp);
   ##files needed
+  gene_divisions<- read.csv('gene_divisions_means.csv');
   goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
   changing_lrt_rdl<- read.csv("changing_lrt_rdl.csv");
   genes_of_interest_means<- read.csv("genes_of_interest_means.csv");
   means_of_changing_genes<- read.csv("means_of_changing_genes.csv");
   ncounts_goi_no_genecol<- read.csv("ncounts_goi_no_genecol.csv");
-  normalized_genecounts<- read.csv("normalized_genecounts.csv")
+  normalized_genecounts<- read.csv("normalized_genecounts.csv");
   dds<- readRDS("dds.RDS")
   dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
   dds$sample
@@ -377,12 +379,10 @@ server<- function(input,output, session) {
     
     output$whole_heatmap<- renderPlot ({
       print("rendering pheatmap")
-
       means_of_changing_genes2<- read.csv('means_of_changing_genes2.csv', header = T)
       row.names(means_of_changing_genes2)<- means_of_changing_genes2$X
       counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
       counts_matrix<-data.matrix(counts)
-
       pheatmap(counts_matrix,
                          scale="row",
                          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
@@ -390,7 +390,7 @@ server<- function(input,output, session) {
                          treeheight_row = 100,
                          cluster_rows=TRUE,
                          cluster_cols=F,
-                         cutree_rows = 4,
+                         cutree_rows = 7,
                          cutree_cols = 5,
                          clustering_distance_rows = "euclidean",
                          clustering_method = "complete",
@@ -400,22 +400,18 @@ server<- function(input,output, session) {
 
       })
     
-    output$whole_heatmap_d3<- renderD3heatmap ({
-      print("rendering d3heatmap")
-#       means_of_changing_genes2<- read.csv('means_of_changing_genes2.csv', header = T)
-#       row.names(means_of_changing_genes2)<- means_of_changing_genes2$X
-#       counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
-#       counts_matrix<-data.matrix(counts)
-      d3heatmap(counts_matrix,
-                scale = 'row',
-                colors= 'Blues',
-                k_row =9,
-                Rowv = T,
-                Colv = T)
       
+    output$gene_div = DT::renderDataTable ({
+      print("rendering gene_divs")
+      # heatmaply(counts_matrix,
+      #           k_col = 5,
+      #           k_row = 7,
+      #           scale = 'row')
+      colnames(gene_divisions)<- c('Gene', 'Cluster')
+      gene_divisions
     
-       })    
-    
+        
+    })
     
     #Heatmap
      output$heatmap2<- renderPlot ({
@@ -434,7 +430,7 @@ server<- function(input,output, session) {
                  fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
         geom_tile() +
-         scale_fill_viridis(na.value = "transparent") +
+        scale_fill_viridis(na.value = "transparent") +
         theme(legend.position = "bottom") +
         theme_minimal()
       
