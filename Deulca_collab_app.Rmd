@@ -373,7 +373,7 @@ server<- function(input,output, session) {
                  fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
         geom_tile() +
-        scale_fill_viridis()+
+        scale_fill_gradient(low = 'Blue',high = 'Red')+
         theme_minimal()
       })
     
@@ -385,7 +385,7 @@ server<- function(input,output, session) {
       counts_matrix<-data.matrix(counts)
       pheatmap(counts_matrix,
                          scale="row",
-                         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+                         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(300),
                          border_color = TRUE,
                          treeheight_row = 100,
                          cluster_rows=TRUE,
@@ -416,8 +416,8 @@ server<- function(input,output, session) {
     #Heatmap
      output$heatmap2<- renderPlot ({
       print("rendering plot")
-      filtered3 = means_of_changing_genes
-      melted3 = melt(means_of_changing_genes)
+      filtered3 = counts_matrix
+      melted3 = melt(counts_matrix)
       colnames(melted3) <- c("Gene","sample","counts")
       print(input$sample1)
       print(input$sig_chan)
@@ -430,9 +430,9 @@ server<- function(input,output, session) {
                  fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
         geom_tile() +
-        scale_fill_viridis(na.value = "transparent") +
         theme(legend.position = "bottom") +
-        theme_minimal()
+        theme_minimal()+
+        scale_fill_gradient(low = 'Blue',high = 'Red')
       
       
      })
