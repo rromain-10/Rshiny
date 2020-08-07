@@ -45,6 +45,44 @@ library(tidyr)
 library(DT)
 library(plotly)
 library(heatmaply)
+
+  ##files needed
+  gene_divisions<- read.csv('gene_divisions_means.csv');
+  goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
+  changing_lrt_rdl<- read.csv("changing_lrt_rdl.csv");
+  genes_of_interest_means<- read.csv("genes_of_interest_means.csv");
+  means_of_changing_genes<- read.csv("means_of_changing_genes.csv");
+  ncounts_goi_no_genecol<- read.csv("ncounts_goi_no_genecol.csv");
+  normalized_genecounts<- read.csv("normalized_genecounts.csv");
+  dds<- readRDS("dds.RDS")
+  dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
+  dds$sample
+  cts<- readRDS("cts.RDS")
+  res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
+  res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
+  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_RasV12')
+  res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
+  res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
+  selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
+                    'PPP2R5B','PPP2R2A','PPP2R2A','PPP2R5D','PPP2R5A','PPP2R5E',
+                    'PPP1CA','PPP1CC','PPP1CB','HEC1','NUF2','SPC24','SPC25')
+  #Gene associated with MEK pathway
+  Mek_genes=c('MAP2K1', 'MAP2K2','MAP2K3','MAP2K4','MAP2K5','MAP2K6','MAP2K7',
+              'PTPN11', 'GBR2','SOS1')
+  
+  #Gens associated with the RAS pathway
+  Ras_genes=c('KRAS','NRAS','BRAF','HRAS','RAF1')
+  
+  #Gene associated with AKT pathway
+  Akt_genes =c('AKT1','AKT2','AKT3','AKT8','PDK1','PDK2','MTOR')
+  
+  #Genes assocaited with T53D4
+  T53D4_genes=c('CDK4', 'TP53')
+  
+  means_of_changing_genes2<- read.csv('means_of_changing_genes2.csv', header = T)
+      row.names(means_of_changing_genes2)<- means_of_changing_genes2$X
+      counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
+      counts_matrix<-data.matrix(counts)
 ```
 
 
@@ -221,39 +259,6 @@ ui<- fluidPage(
 ```{r figures and displays}
 server<- function(input,output, session) {
   session$onSessionEnded(stopApp);
-  ##files needed
-  gene_divisions<- read.csv('gene_divisions_means.csv');
-  goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
-  changing_lrt_rdl<- read.csv("changing_lrt_rdl.csv");
-  genes_of_interest_means<- read.csv("genes_of_interest_means.csv");
-  means_of_changing_genes<- read.csv("means_of_changing_genes.csv");
-  ncounts_goi_no_genecol<- read.csv("ncounts_goi_no_genecol.csv");
-  normalized_genecounts<- read.csv("normalized_genecounts.csv");
-  dds<- readRDS("dds.RDS")
-  dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
-  dds$sample
-  cts<- readRDS("cts.RDS")
-  res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
-  res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
-  res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_RasV12')
-  res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
-  res_ARPE19_vs_Aktmyr<- readRDS('res/res_ARPE19_vs_Aktmyr')
-  selectedGenes = c('BUB1B','AURKB','BUB1','SKA1','SKA2','SKA3','SGO1','PPP2R5C',
-                    'PPP2R5B','PPP2R2A','PPP2R2A','PPP2R5D','PPP2R5A','PPP2R5E',
-                    'PPP1CA','PPP1CC','PPP1CB','HEC1','NUF2','SPC24','SPC25')
-  #Gene associated with MEK pathway
-  Mek_genes=c('MAP2K1', 'MAP2K2','MAP2K3','MAP2K4','MAP2K5','MAP2K6','MAP2K7',
-              'PTPN11', 'GBR2','SOS1')
-  
-  #Gens associated with the RAS pathway
-  Ras_genes=c('KRAS','NRAS','BRAF','HRAS','RAF1')
-  
-  #Gene associated with AKT pathway
-  Akt_genes =c('AKT1','AKT2','AKT3','AKT8','PDK1','PDK2','MTOR')
-  
-  #Genes assocaited with T53D4
-  T53D4_genes=c('CDK4', 'TP53')
-  
    ({
   
     #MAplots ARPE19 vs T53D4 
@@ -390,10 +395,6 @@ server<- function(input,output, session) {
     
     output$whole_heatmap<- renderPlot ({
       print("rendering pheatmap")
-      means_of_changing_genes2<- read.csv('means_of_changing_genes2.csv', header = T)
-      row.names(means_of_changing_genes2)<- means_of_changing_genes2$X
-      counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
-      counts_matrix<-data.matrix(counts)
       pheatmap(counts_matrix,
                          scale="row",
                          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(300),
