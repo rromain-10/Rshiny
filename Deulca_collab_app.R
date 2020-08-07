@@ -1,19 +1,8 @@
----
-title: "ARPE19"
-output:
-  word_document: default
-  html_document:
-    df_print: paged
----
-
-# install.packages("rmarkdown")
-# install.packages('rsconnect')
-
-```{r include=F}
+## ----include=F--------------------------------------------------------------------------------------
 knitr::opts_chunk$set (echo=F)
-```
 
-```{r packages}
+
+## ----packages---------------------------------------------------------------------------------------
 #install.packages('devtools')
 ##install.packages('viridisLite')
 
@@ -82,11 +71,9 @@ library(heatmaply)
       row.names(means_of_changing_genes2)<- means_of_changing_genes2$X
       counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
       counts_matrix<-data.matrix(counts)
-```
 
 
-
-```{r Inputs and outputs}
+## ----Inputs and outputs-----------------------------------------------------------------------------
 ui<- fluidPage(
   titlePanel("ARPE (human retinal cells) progression data view"),
   dashboardBody( "
@@ -248,14 +235,9 @@ ui<- fluidPage(
    )
    
 
-```
 
 
-
-
-
-
-```{r figures and displays}
+## ----figures and displays---------------------------------------------------------------------------
 server<- function(input,output, session) {
   session$onSessionEnded(stopApp);
    ({
@@ -456,14 +438,13 @@ server<- function(input,output, session) {
    
   
      
-```
 
 
-```{r App}
+## ----App--------------------------------------------------------------------------------------------
 shinyApp(ui=ui, server=server)
-```
 
-```{r}
+
+## ---------------------------------------------------------------------------------------------------
 # library(rsconnect)
 # rsconnect::setAccountInfo(name='rromain-10',
 # 			  token='708AE86DD216401F0304DE58972E2A49',
@@ -471,6 +452,4 @@ shinyApp(ui=ui, server=server)
 # 
 # getwd()
 # rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
-```
-
 
