@@ -6,8 +6,8 @@ output:
     df_print: paged
 ---
 
-#install.packages("rmarkdown")
-#install.packages('rsconnect')
+# install.packages("rmarkdown")
+# install.packages('rsconnect')
 
 ```{r include=F}
 knitr::opts_chunk$set (echo=F)
@@ -15,13 +15,22 @@ knitr::opts_chunk$set (echo=F)
 
 ```{r packages}
 #install.packages('devtools')
-#install.packages('viridisLite')
+##install.packages('viridisLite')
 
 # if (!requireNamespace("BiocManager", quietly = TRUE))
 #     install.packages("BiocManager")
-# BiocManager::install()
+# BiocManager::install(version = "3.11")
+# BiocManager::install("DESeq2")
+# BiocManager::install("biomaRt")
+# BiocManager::install("ensembldb")
+# BiocManager::repositories("https://git.bioconductor.org/packages/XVector")
+# options(repos = BiocManager::repositories("git clone https://git.bioconductor.org/packages/XVector"))
 
-#library(devtools)
+library(XVector)
+library(rmarkdown)
+library(rsconnect)
+library(biomaRt)
+library(devtools)
 library(shiny)
 library(ggplot2)
 library(reshape2)
@@ -33,9 +42,6 @@ library(DESeq2)
 library(shinydashboard)
 library(viridis)
 library(tidyr)
-library(d3heatmap)
-library(plotly)
-library(heatmaply)
 library(DT)
 ```
 
@@ -403,10 +409,6 @@ server<- function(input,output, session) {
       
     output$gene_div = DT::renderDataTable ({
       print("rendering gene_divs")
-      # heatmaply(counts_matrix,
-      #           k_col = 5,
-      #           k_row = 7,
-      #           scale = 'row')
       colnames(gene_divisions)<- c('Gene', 'Cluster')
       gene_divisions
     
@@ -446,13 +448,13 @@ shinyApp(ui=ui, server=server)
 ```
 
 ```{r}
-# rsconnect::setAccountInfo(name='onishlab',
-#                          token='0AF9850962CCB0641D2DB5E43B4AFA8E',
-#                          secret='xtoBU96rxwjtBShyzmd5WhbrQy/xzwgdvfsF5zpr')
-# 
-# library(rsconnect)
-# getwd()
-#rsconnect::deployApp(".", appTitle = 'ARPE19 cancer cell progression app', account = 'onishlab')
+library(rsconnect)
+rsconnect::setAccountInfo(name='rromain-10',
+			  token='708AE86DD216401F0304DE58972E2A49',
+			  secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
+
+getwd()
+rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
 ```
 
 
