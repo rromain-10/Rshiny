@@ -42,13 +42,9 @@ library(DESeq2)
 library(shinydashboard)
 library(viridis)
 library(tidyr)
-<<<<<<< HEAD
 library(DT)
-=======
-library(d3heatmap)
 library(plotly)
 library(heatmaply)
->>>>>>> f8b28296b1a296c50b3c301a6e9cc12f3582613b
 ```
 
 
@@ -177,21 +173,16 @@ ui<- fluidPage(
     sidebarLayout(
       sidebarPanel(
         checkboxGroupInput( inputId = 'none',
-<<<<<<< HEAD
                             label = 'Type gene name into search bar to see associated cluster'
                           )
         ),
-      mainPanel(
-        DT::dataTableOutput('gene_div')
-=======
+      mainPanel(DT::dataTableOutput('gene_div'),
                             label = 'Interactive Heatmap'
                           )
         ),
       mainPanel(
         plotOutput('whole_heatmaply')
->>>>>>> f8b28296b1a296c50b3c301a6e9cc12f3582613b
             )
-    )
    ),
   
   #boxplot for significantly changing genes 
@@ -263,7 +254,7 @@ server<- function(input,output, session) {
   #Genes assocaited with T53D4
   T53D4_genes=c('CDK4', 'TP53')
   
-  ({
+   ({
   
     #MAplots ARPE19 vs T53D4 
     output$MAplot1 <- renderPlot ({
@@ -420,13 +411,14 @@ server<- function(input,output, session) {
 
       })
     
-<<<<<<< HEAD
       
     output$gene_div = DT::renderDataTable ({
       print("rendering gene_divs")
       colnames(gene_divisions)<- c('Gene', 'Cluster')
       gene_divisions
-=======
+      
+    })
+      
     output$whole_heatmaply<- renderPlot ({
       print("rendering heatmaply")
       # heatmaply(counts_matrix,
@@ -434,9 +426,7 @@ server<- function(input,output, session) {
       #           k_row = 7,
       #           scale = 'row')
 
->>>>>>> f8b28296b1a296c50b3c301a6e9cc12f3582613b
-    
-        
+  
     })
     
     #Heatmap
@@ -456,18 +446,16 @@ server<- function(input,output, session) {
                  fill =counts)) + 
         ggtitle ("Mean counts of significantly changing genes of interest") +
         geom_tile() +
-<<<<<<< HEAD
-=======
         scale_fill_viridis(na.value = "transparent") +
->>>>>>> f8b28296b1a296c50b3c301a6e9cc12f3582613b
         theme(legend.position = "bottom") +
         theme_minimal()+
         scale_fill_gradient(low = 'Blue',high = 'Red')
-      
-      
      })
     })
   }
+   
+  
+     
 ```
 
 
@@ -476,13 +464,13 @@ shinyApp(ui=ui, server=server)
 ```
 
 ```{r}
-library(rsconnect)
-rsconnect::setAccountInfo(name='rromain-10',
-			  token='708AE86DD216401F0304DE58972E2A49',
-			  secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
-
-getwd()
-rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
+# library(rsconnect)
+# rsconnect::setAccountInfo(name='rromain-10',
+# 			  token='708AE86DD216401F0304DE58972E2A49',
+# 			  secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
+# 
+# getwd()
+# rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
 ```
 
 
