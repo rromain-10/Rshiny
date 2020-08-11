@@ -470,7 +470,7 @@ shinyApp(ui=ui, server=server)
 # 			  secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
 # 
 # getwd()
-# rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
+# rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10', appPrimaryDoc = "Deulca_collab_app.R")
 ```
 
 
