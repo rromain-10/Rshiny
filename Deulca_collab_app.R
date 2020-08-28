@@ -88,7 +88,7 @@ ui<- fluidPage(
       
       "______________________________________________________________________________________________________________________________________________________________________________________________________",
       
-    "MAplots displayed below shows significant up or down regulation of expressed genes, where the comparsions are between plot titles lited (lfc=0.01)  "
+    "MAplots displayed below shows significant up or down regulation of expressed genes, where the comparsions are between plot titles listed (lfc=0.01)  "
   ),
   
   fluidRow(
@@ -181,8 +181,8 @@ ui<- fluidPage(
                           )
         ),
       mainPanel(
-        plotOutput('whole_heatmap')
-            )
+        img(src="BigHeatmap.png")
+      )
     )
    ),
   
@@ -374,24 +374,24 @@ server<- function(input,output, session) {
         theme_minimal()
       })
     
-    output$whole_heatmap<- renderPlot ({
-      print("rendering pheatmap")
-      pheatmap(counts_matrix,
-                         scale="row",
-                         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(300),
-                         border_color = TRUE,
-                         treeheight_row = 100,
-                         cluster_rows=TRUE,
-                         cluster_cols=F,
-                         cutree_rows = 7,
-                         cutree_cols = 5,
-                         clustering_distance_rows = "euclidean",
-                         clustering_method = "complete",
-                         show_rownames = T)
-    
-      
-
-      })
+    # output$whole_heatmap<- renderPlot ({
+    #   print("rendering pheatmap")
+    #   pheatmap(counts_matrix,
+    #                      scale="row",
+    #                      color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(300),
+    #                      border_color = TRUE,
+    #                      treeheight_row = 100,
+    #                      cluster_rows=TRUE,
+    #                      cluster_cols=F,
+    #                      cutree_rows = 7,
+    #                      cutree_cols = 5,
+    #                      clustering_distance_rows = "euclidean",
+    #                      clustering_method = "complete",
+    #                      show_rownames = T)
+    # 
+    #   
+    # 
+    #   })
     
       
     output$gene_div = DT::renderDataTable ({
@@ -401,15 +401,13 @@ server<- function(input,output, session) {
       
     })
       
-    output$whole_heatmaply<- renderPlot ({
-      print("rendering heatmaply")
-      # heatmaply(counts_matrix,
-      #           k_col = 5,
-      #           k_row = 7,
-      #           scale = 'row')
-
-  
-    })
+    # output$whole_heatmaply<- renderPlot ({
+    #   print("rendering heatmaply")
+    #   # heatmaply(counts_matrix,
+    #   #           k_col = 5,
+    #   #           k_row = 7,
+    #   #           scale = 'row')
+    # })
     
     #Heatmap
      output$heatmap2<- renderPlot ({
