@@ -72,6 +72,7 @@ library(heatmaply)
       counts<-means_of_changing_genes2[,2:length(means_of_changing_genes2[1,])]
       counts_matrix<-data.matrix(counts)
 
+bigheatmap_img = base64enc::dataURI(file="BigHeatmap.png", mime="image/png")
 
 ## ----Inputs and outputs-----------------------------------------------------------------------------
 ui<- fluidPage(
@@ -181,7 +182,7 @@ ui<- fluidPage(
                           )
         ),
       mainPanel(
-        img(src="BigHeatmap.png")
+        img(src=bigheatmap_img, width="732px", heigt="497px")
       )
     )
    ),
