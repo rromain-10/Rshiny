@@ -35,18 +35,18 @@ library(plotly)
 library(heatmaply)
 
   ##files needed
-  gene_divisions<- read.csv('gene_divisions_means.csv');
+  gene_divisions<- read.csv('20200923_gene_divisions_means.csv');
   goi_ncounts<- read.csv("DEseq2_means_goi_ncounts.csv");
-  changing_lrt_rdl<- read.csv("changing_lrt_rdl.csv");
-  genes_of_interest_means<- read.csv("genes_of_interest_means.csv");
-  means_of_changing_genes<- read.csv("means_of_changing_genes.csv");
+  changing_lrt_rdl<- read.csv("20200923_changing_lrt_rdl.csv");
+  genes_of_interest_means<- read.csv("20200923_genes_of_interest_means.csv");
+  means_of_changing_genes<- read.csv("20200923_means_of_changing_genes.csv");
   ncounts_goi_no_genecol<- read.csv("ncounts_goi_no_genecol.csv");
-  normalized_genecounts<- read.csv("normalized_genecounts.csv");
+  normalized_genecounts<- read.csv("20200923_normalized_genecounts.csv");
   dds<- readRDS("dds.RDS")
   dds$sample <- factor(dds$sample, levels=c("ARPE19", "T53D4", "RasV12", "Aktmyr", "MekDD"))
   dds$sample
   cts<- readRDS("cts.RDS")
-  res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
+  #res_T53D4_vs_MekDD<- readRDS('res/res_T53D4_vs_MekDD.RDS')
   res_ARPE19_vs_T53D4<-readRDS ('res/res_ARPE19_vs_T53D4')
   res_ARPE19_vs_RasV12<- readRDS ('res/res_ARPE19_vs_RasV12')
   res_ARPE19_vs_MekDD<- readRDS('res/res_ARPE19_vs_MekDD')
