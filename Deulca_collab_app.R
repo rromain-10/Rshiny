@@ -445,10 +445,10 @@ shinyApp(ui=ui, server=server)
 
 ## ---------------------------------------------------------------------------------------------------
 # library(rsconnect)
-# rsconnect::setAccountInfo(name='rromain-10',
-# 			  token='708AE86DD216401F0304DE58972E2A49',
-# 			  secret='B+AAnRaJVGVFzu98RU3u6LXF7cVqeSSVmk4YJqOE')
+# rsconnect::setAccountInfo(name='onishlab',
+#                           token='C1E0A73570EF891C8ACF5D1C00144C1C',
+#                           secret='00jn0wfb//WoESIvtONyd/w3qqaHr1la8lb+b2Wa')
+# 
 # 
 # getwd()
-# rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'rromain-10')
-
+# rsconnect::deployApp("/Users/romarioromain/OneDrive - Colostate/RR_ARPE_DELUCA_COLLAB/Rshiny", appTitle = 'ARPE19 cancer cell progression app', account = 'onishlab', appPrimaryDoc = "Deulca_collab_app.R")
